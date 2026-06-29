@@ -54,7 +54,7 @@ export default function Home() {
   // Get failure reason description
   const getFailureReason = (reasonKey) => {
     const reasonMap = {
-      'insufficient_funds': 'Insufficient funds in customer\\\\'s payment method',
+      'insufficient_funds': 'Insufficient funds in customer\\'s payment method',
       'card_declined': 'Card was declined by issuer',
       'expired_card': 'Payment method has expired',
       'fraudulent_payment': 'Payment flagged for fraud',
