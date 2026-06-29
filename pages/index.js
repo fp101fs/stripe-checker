@@ -52,7 +52,7 @@ export default function Home() {
   const formatAmount = (cents) => (cents / 100).toFixed(2);
 
   // Get failure reason description
-  const getFailureReason = (reasons) => {
+  const getFailureReason = (reasonKey) => {
     const reasonMap = {
       'insufficient_funds': 'Insufficient funds in customer\\'s payment method',
       'card_declined': 'Card was declined by issuer',
@@ -61,7 +61,7 @@ export default function Home() {
       'incorrect_routing_number': 'Incorrect routing number for bank transfer',
       'invalid_account': 'Invalid bank account details'
     };
-    return reasonMap[reasons] || reasons;
+    return reasonMap[reasonKey] || reasonKey;
   };
 
   // Load charges (simulated)
@@ -121,18 +121,18 @@ Format your response as JSON with these fields:
   "insight": "Brief insight about root cause"
 }
 Here are the failed charges:
-${chargeData.map(c => \`- \`${c.id}\`: ${c.amount} ${c.currency} (\${c.reason}) - Customer: \${c.customer} (const c.created)\`).join("\\n")}`;
+${chargeData.map(c => `- \`${c.id}\`: ${c.amount} ${c.currency} (${c.reason}) - Customer: ${c.customer} (${new Date(c.created * 1000).toLocaleString()})`).join('\n')}`;
 
       // Call OpenRouter AI
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
         headers: {
-          "Authorization": `Bearer ${openRouterApiKey}`,
-          "Content-Type": "application/json"
+          'Authorization': `Bearer ${openRouterApiKey}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: "gpt-4-turbo",
-          messages: [{ role: "user", content: prompt }],
+          model: 'gpt-4-turbo',
+          messages: [{ role: 'user', content: prompt }],
           max_tokens: 500
         })
       });
@@ -151,20 +151,22 @@ ${chargeData.map(c => \`- \`${c.id}\`: ${c.amount} ${c.currency} (\${c.reason}) 
       const parsed = JSON.parse(aiMessage);
       
       // Display results
-      const issuesHtml = parsed.issues?.map(issue => `
-        <div class="issue-item">
+      const issuesHtml = parsed.issues?.map(issue => 
+        `<div class="issue-item">
           <div class="issue-icon">⚠️</div>
           <div class="issue-content">
             <div class="issue-title">${issue.title}</div>
             <div class="issue-desc">${issue.description}</div>
           </div>
-        </div>
-      `).join("") || "<div class='issue-item'><div class="issue-desc">No specific issues identified</div></div>";
+        </div>`
+      ).join('') || '<div class="issue-item"><div class="issue-desc">No specific issues identified</div></div>';
 
-      const fixesHtml = parsed.fixes?.map(fix => `<div class="fix-item">${fix}</div>`).join("") || "<div class="fix-item">No specific fixes suggested</div>";
+      const fixesHtml = parsed.fixes?.map(fix => 
+        `<div class="fix-item">${fix}</div>`
+      ).join('') || '<div class="fix-item">No specific fixes suggested</div>';
 
       setAnalysisResult({
-        insight: parsed.insight || "Unable to extract insight",
+        insight: parsed.insight || 'Unable to extract insight',
         issuesHtml,
         fixesHtml
       });
@@ -242,9 +244,11 @@ ${chargeData.map(c => \`- \`${c.id}\`: ${c.amount} ${c.currency} (\${c.reason}) 
         </button>
       </div>
 
-      {error && <div className="status-badge status-failed" style={{ marginTop: "1rem" }}>
-        {error}
-      </div>
+      {error && (
+        <div className="status-badge status-failed" style={{ marginTop: "1rem" }}>
+          {error}
+        </div>
+      )}
 
       {loading && (
         <div className="status-badge" style={{ marginTop: "1rem" }}>
@@ -261,11 +265,17 @@ ${chargeData.map(c => \`- \`${c.id}\`: ${c.amount} ${c.currency} (\${c.reason}) 
           </div>
           <div className="issue-section">
             <div className="analysis-title">⚠️ Issues Identified</div>
-            <div dangerouslySetInnerHTML={{ __html: analysisResult.issuesHtml }} />
+            <div 
+              className="analysis-content" 
+              dangerouslySetInnerHTML={{ __html: analysisResult.issuesHtml }}
+            />
           </div>
           <div className="fix-section">
             <div className="analysis-title">🔧 Recommended Actions</div>
-            <div dangerouslySetInnerHTML={{ __html: analysisResult.fixesHtml }} />
+            <div 
+              className="analysis-content" 
+              dangerouslySetInnerHTML={{ __html: analysisResult.fixesHtml }}
+            />
           </div>
         </div>
       )}
