@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stripe Seller Transaction Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a, #334165, #4338ca);
+      padding: 1.5rem;
+      overflow-x: hidden;
+      color: #fff;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb-1 {
+      width: 420px;
+      height: 420px;
+      background: rgba(15, 23, 42, 0.35);
+      top: -120px;
+      left: -100px;
+      animation: float 18s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 380px;
+      height: 380px;
+      background: rgba(51, 65, 101, 0.25);
+      bottom: -100px;
+      right: -80px;
+      animation: float 24s ease-in-out infinite reverse;
+    }
+
+    .orb-3 {
+      width: 280px;
+      height: 280px;
+      background: rgba(67, 56, 202, 0.2);
+      top: 50%;
+      left: 55%;
+      transform: translate(-50%, -50%);
+      animation: float 22s ease-in-out infinite 1s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, -20px) scale(1.05); }
+      66% { transform: translate(-20px, 40px) scale(0.95); }
+    }
+
+    .glass {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 580px;
+      padding: 3rem 2.5rem;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      text-align: center;
+    }
+
+    .icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.25rem;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 0.6rem;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .input-grid { grid-template-columns: 1fr; }
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      width: 100%;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.75);
+      font-weight: 500;
+    }
+
+    input, select {
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+    }
+    
+      input:focus, select:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+      }
+    
+      input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .primary {
+      background: #fff;
+      color: #1a1a2e;
+    }
+      .primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -4px rgba(255,255,255,0.2); }
+      .primary:active { transform: translateY(0); }
+      .primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+      .secondary:hover { background: rgba(255, 255, 255, 0.2); }
+      .secondary:active { background: rgba(255, 255, 255, 0.3); }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.375rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0.5rem auto;
+      width: max-content;
+    }
+
+    .status-failed {
+      background: rgba(248, 113, 113, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+
+    .status-success {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .card-list {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card-item {
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s ease;
+    }
+    
+      .card-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+      }
+
+    .card-item-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .card-item-id {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .card-item-status {
+      font-size: 0.75rem;
+    }
+
+    .analysis {
+      margin-top: 1.75rem;
+      padding: 1.25rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .analysis-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .issue-item {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    
+      .issue-icon {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+      
+      .issue-content {
+        flex: 1;
+      }
+      
+      .issue-title {
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 0.25rem;
+      }
+      
+      .issue-desc {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.75);
+        line-height: 1.5;
+      }
+
+    .fix-item {
+      margin-bottom: 0.75rem;
+      padding-left: 2rem;
+      position: relative;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+    }
+    
+      .fix-item:before {
+        content: '•';
+        position: absolute;
+        left: 0.75rem;
+        color: #66aaff;
+        font-weight: 600;
+      }
+
+    .ai-insight {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(102, 166, 255, 0.15);
+      border: 1px solid rgba(102, 166, 255, 0.3);
+    }
+    
+      .ai-insight-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #66aaff;
+        margin-bottom: 0.5rem;
+      }
+      
+      .ai-insight-content {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+    .footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 2.5rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+    }
+
+    @media (max-width: 500px) {
+      .glass { padding: 2rem 1.5rem; }
+      h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <main class="glass">
+    <div class="icon">⚡</div>
+    <h1>Stripe Seller Analyzer</h1>
+    <p class="subtitle">Enter your Stripe API key to load recent failed charges and analyze them with AI</p>
+
+    <div class="input-grid">
+      <div class="input-group">
+        <label for="stripe-api-key">Stripe API Secret Key</label>
+        <input type="text" id="stripe-api-key" placeholder="sk_test_...">
+      </div>
+      <div class="input-group">
+        <label for="openrouter-api-key">OpenRouter API Key <small>(optional for AI analysis)</small></label>
+        <input type="text" id="openrouter-api-key" placeholder="sk-or-...">
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title"><i>🔍</i>Recent Failed Charges</div>
+      <div id="failed-charges-list" class="card-list">
+        <!-- Charges will be loaded here -->
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button id="load-charges" class="btn primary">
+        <i></i> Load Failed Charges
+      </button>
+      <button id="analyze-charges" class="btn secondary" style="display:none;">
+        <i></i> Analyze with AI
+      </button>
+    </div>
+
+    <div id="loading-message" class="status-badge" style="margin-top:1rem; display:none;">
+      Loading...
+    </div>
+
+    <div id="analysis-status" class="status-badge" style="margin-top:1rem; display:none;"></div>
+
+    <div id="result" class="analysis" style="display:none;">
+      <div class="analysis-title">🤖 AI Analysis & Fixes</div>
+      <div class="ai-insight">
+        <div class="ai-insight-title">💡 AI Insight</div>
+        <div id="ai-insight-text"></div>
+      </div>
+      <div class="issue-section">
+        <div class="analysis-title">⚠️ Issues Identified</div>
+        <div id="issues-container"></div>
+      </div>
+      <div class="fix-section">
+        <div class="analysis-title">🔧 Recommended Actions</div>
+        <div id="fixes-container"></div>
+      </div>
+    </div>
+
+    <div class="footer">Powered by Stripe & OpenRouter AI</div>
+  </main>
+
+  <script>
+    // DOM Elements
+    const stripeApiKeyInput = document.getElementById('stripe-api-key');
+    const openrouterApiKeyInput = document.getElementById('openrouter-api-key');
+    const loadBtn = document.getElementById('load-charges');
+    const analyzeBtn = document.getElementById('analyze-charges');
+    const chargesList = document.getElementById('failed-charges-list');
+    const loadingMessage = document.getElementById('loading-message');
+    const analysisStatus = document.getElementById('analysis-status');
+    const resultArea = document.getElementById('result');
+    const issuesContainer = document.getElementById('issues-container');
+    const fixesContainer = document.getElementById('fixes-container');
+    const aiInsightText = document.getElementById('ai-insight-text');
+    const recentCharges = []; // Store loaded charges
+
+    // Utility: Create charge card element
+    function createChargeCard(charge) {
+      const card = document.createElement('div');
+      card.className = 'card-item';
+      card.innerHTML = `
+        <div class="card-item-header">
+          <span class="card-item-id">Charge ID: ${charge.id}</span>
+          <span class="card-item-status" style="background:${getStatusBackground(charge)}; color:#333;">${charge.status.toUpperCase()}</span>
+        </div>
+        <div style="font-size:0.9rem; color:#ddd;">
+          Amount: ${formatAmount(charge.amount)} ${charge.currency.toUpperCase()} • 
+          Created: ${new Date(charge.created * 1000).toLocaleString()}
+        </div>
+      `;
+      return card;
+    }
+
+    function getStatusBackground(charge) {
+      const statuses = {
+        'succeeded': '#4683ff',
+        'processing': '#22c55e',
+        'failed': '#ff6b6b',
+        'canceled': '#7f7fff'
+      };
+      return statuses[charge.status] || '#ff6b6b';
+    }
+
+    function formatAmount(amount) {
+      return (amount / 100).toFixed(2);
+    }
+
+    // Load Stripe charges
+    async function loadStripeCharges() {
+      // Validate API key
+      if (!stripeApiKeyInput.value.trim()) {
+        alert('Please enter your Stripe API secret key');
+        return;
+      }
+
+      // Show loading
+      loadingMessage.style.display = 'block';
+      loadBtn.disabled = true;
+      analyzeBtn.style.display = 'none';
+      resultArea.style.display = 'none';
+      issuesContainer.innerHTML = '';
+      fixesContainer.innerHTML = '';
+
+      try {
+        // Call Stripe API to get failed charges
+        const response = await fetch('https://api.stripe.com/v1/charges', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${stripeApiKeyInput.value}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const error = await response.text();
+          throw new Error(`Stripe API error: ${response.status} - ${error}`);
+        }
+
+        const data = await response.json();
+        const charges = data.data || [];
+
+        // Store and render charges
+        recentCharges.length = 0;
+        recentCharges.push(...charges.slice(0, 10)); // Limit to 10 most recent
+        chargesList.innerHTML = '';
+        recentCharges.forEach(charge => {
+          chargesList.appendChild(createChargeCard(charge));
+        });
+
+        // Show analyze button now that we have charges
+        analyzeBtn.style.display = 'block';
+        
+      } catch (error) {
+        console.error('Error loading charges:', error);
+        alert('Failed to load charges. Please check your API key and try again.');
+        recentCharges.length = 0;
+        chargesList.innerHTML = '';
+        analyzeBtn.style.display = 'none';
+      } finally {
+        loadingMessage.style.display = 'none';
+        loadBtn.disabled = false;
+      }
+    }
+
+    // Analyze with OpenRouter AI
+    async function analyzeChargesWithAI() {
+      if (recentCharges.length === 0) {
+        alert('Please load charges first');
+        return;
+      }
+
+      // Disable button and show status
+      analyzeBtn.disabled = true;
+      analysisStatus.style.display = 'block';
+      analysisStatus.textContent = 'Analyzing with AI...';
+      analysisStatus.className = 'status-badge status-failed';
+
+      try {
+        // Prepare charges data for AI
+        const chargesData = recentCharges.map(ch => ({
+          id: ch.id,
+          amount: formatAmount(ch.amount),
+          currency: ch.currency,
+          created: new Date(ch.created * 1000).toLocaleString(),
+          reason: getFailureReason(ch),
+          customer: ch.customer || 'unknown'
+        }));
+
+        // Build AI prompt
+        const prompt = `You are an expert in Stripe payments. Analyze these failed charges and provide:
+1. Key issues identified (max 3)
+2. Actionable fixes for each issue
+3. One concise insight about the likely root cause
+
+Format your response as JSON with these fields:
+{
+  "issues": [
+    {
+      "title": "Issue title",
+      "description": "Short description"
+    }
+  ],
+  "fixes": [
+    "Fix suggestion 1",
+    "Fix suggestion 2"
+  ],
+  "insight": "Brief insight about root cause"
+}
+Here are the failed charges:
+${chargesData.map(c => `-\`${c.id}\`: ${c.amount} ${c.currency} (${c.reason}) - Customer: ${c.customer} (${c.created})`).join('\n')}`;
+
+        // Call OpenRouter AI
+        const openrouterKey = openrouterApiKeyInput.value.trim();
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openrouterKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'gpt-4-turbo',
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 500
+          })
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(`OpenRouter API error: ${response.status} - ${errText}`);
+        }
+
+        const aiResponse = await response.json();
+        const aiMessage = aiResponse.choices?.[0]?.message?.content;
+        
+        if (!aiMessage) throw new Error('No response from AI');
+
+        // Parse JSON response
+        const parsed = JSON.parse(aiMessage);
+        
+        // Update UI with results
+        displayAIAnalysis(parsed);
+        
+      } catch (error) {
+        console.error('AI Analysis error:', error);
+        analysisStatus.textContent = 'AI analysis failed';
+        analysisStatus.className = 'status-badge status-failed';
+        alert('AI analysis failed. Please check your OpenRouter API key and try again.');
+      } finally {
+        analyzeBtn.disabled = false;
+      }
+    }
+
+    function getFailureReason(charge) {
+      // Extract failure reason from Stripe charge object
+      // This is simplified - actual reason may be in charge.failure_reason
+      const reasons = {
+        'insufficient_funds': 'Insufficient funds in customer\'s payment method',
+        'card_declined': 'Card was declined by issuer',
+        'expired_card': 'Payment method has expired',
+        'fraudulent_payment': 'Payment flagged for fraud',
+        'incorrect_routing_number': 'Incorrect routing number for bank transfer',
+        'invalid_account': 'Invalid bank account details'
+      };
+      return reasons[charge.failure_reason] || charge.failure_reason || 'Unknown failure';
+    }
+
+    function displayAIAnalysis(data) {
+      // Update status
+      analysisStatus.style.display = 'none';
+      
+      // Update AI insight
+      if (data.insight) {
+        aiInsightText.textContent = data.insight;
+      } else {
+        aiInsightText.textContent = 'Unable to extract insight from AI response';
+      }
+
+      // Update issues
+      if (Array.isArray(data.issues) && data.issues.length > 0) {
+        issuesContainer.innerHTML = data.issues.map(issue => `
+          <div class="issue-item">
+            <div class="issue-icon">⚠️</div>
+            <div class="issue-content">
+              <div class="issue-title">${issue.title}</div>
+              <div class="issue-desc">${issue.description}</div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        issuesContainer.innerHTML = '<div class="issue-item"><div class="issue-desc">No specific issues identified</div></div>';
+      }
+
+      // Update fixes
+      if (Array.isArray(data.fixes) && data.fixes.length > 0) {
+        fixesContainer.innerHTML = data.fixes.map(fix => `
+          <div class="fix-item">${fix}</div>
+        `).join('');
+      } else {
+        fixesContainer.innerHTML = '<div class="fix-item">No specific fixes suggested</div>';
+      }
+
+      // Show results
+      resultArea.style.display = 'block';
+    }
+
+    // Event Listeners
+    loadBtn.addEventListener('click', loadStripeCharges);
+    analyzeBtn.addEventListener('click', analyzeChargesWithAI);
+  </script>
+</body>
+</html>
