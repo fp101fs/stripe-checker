@@ -1,0 +1,350 @@
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a, #334165, #4338ca);
+      padding: 1.5rem;
+      overflow-x: hidden;
+      color: #fff;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb-1 {
+      width: 420px;
+      height: 420px;
+      background: rgba(15, 23, 42, 0.35);
+      top: -120px;
+      left: -100px;
+      animation: float 18s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 380px;
+      height: 380px;
+      background: rgba(51, 65, 101, 0.25);
+      bottom: -100px;
+      right: -80px;
+      animation: float 24s ease-in-out infinite reverse;
+    }
+
+    .orb-3 {
+      width: 280px;
+      height: 280px;
+      background: rgba(67, 56, 202, 0.2);
+      top: 50%;
+      left: 55%;
+      transform: translate(-50%, -50%);
+      animation: float 22s ease-in-out infinite 1s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, -20px) scale(1.05); }
+      66% { transform: translate(-20px, 40px) scale(0.95); }
+    }
+
+    .glass {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 580px;
+      padding: 3rem 2.5rem;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      text-align: center;
+    }
+
+    .icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.25rem;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 0.6rem;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .input-grid { grid-template-columns: 1fr; }
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      width: 100%;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.75);
+      font-weight: 500;
+    }
+
+    input, select {
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+    }
+    
+      input:focus, select:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+      }
+    
+      input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .primary {
+      background: #fff;
+      color: #1a1a2e;
+    }
+      .primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -4px rgba(255,255,255,0.2); }
+      .primary:active { transform: translateY(0); }
+      .primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+      .secondary:hover { background: rgba(255, 255, 255, 0.2); }
+      .secondary:active { background: rgba(255, 255, 255, 0.3); }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.375rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0.5rem auto;
+      width: max-content;
+    }
+
+    .status-failed {
+      background: rgba(248, 113, 113, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+
+    .status-success {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .card-list {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card-item {
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s ease;
+    }
+    
+      .card-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+      }
+
+    .card-item-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .card-item-id {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .card-item-status {
+      font-size: 0.75rem;
+    }
+
+    .analysis {
+      margin-top: 1.75rem;
+      padding: 1.25rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .analysis-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .issue-item {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    
+      .issue-icon {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+      
+      .issue-content {
+        flex: 1;
+      }
+      
+      .issue-title {
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 0.25rem;
+      }
+      
+      .issue-desc {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.75);
+        line-height: 1.5;
+      }
+
+    .fix-item {
+      margin-bottom: 0.75rem;
+      padding-left: 2rem;
+      position: relative;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.5;
+    }
+    
+      .fix-item:before {
+        content: '•';
+        position: absolute;
+        left: 0.75rem;
+        color: #66aaff;
+        font-weight: 600;
+      }
+
+    .ai-insight {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(102, 166, 255, 0.15);
+      border: 1px solid rgba(102, 166, 255, 0.3);
+    }
+    
+      .ai-insight-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #66aaff;
+        margin-bottom: 0.5rem;
+      }
+      
+      .ai-insight-content {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+    .footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 2.5rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+    }
+
+    @media (max-width: 500px) {
+      .glass { padding: 2rem 1.5rem; }
+      h1 { font-size: 1.6rem; }
+    }
