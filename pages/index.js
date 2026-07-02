@@ -54,7 +54,7 @@ export default function Home() {
   // Get failure reason description
   const getFailureReason = (reasons) => {
     const reasonMap = {
-      'insufficient_funds': 'Insufficient funds in customer\\'s payment method',
+      'insufficient_funds': "Insufficient funds in customer's payment method",
       'card_declined': 'Card was declined by issuer',
       'expired_card': 'Payment method has expired',
       'fraudulent_payment': 'Payment flagged for fraud',
@@ -121,7 +121,7 @@ Format your response as JSON with these fields:
   "insight": "Brief insight about root cause"
 }
 Here are the failed charges:
-${chargeData.map(c => \`- \`${c.id}\`: ${c.amount} ${c.currency} (\${c.reason}) - Customer: \${c.customer} (const c.created)\`).join("\\n")}`;
+${chargeData.map(c => `- ${c.id}: ${c.amount} ${c.currency} (${c.reason}) - Customer: ${c.customer} (${c.created})`).join("\n")}`;
 
       // Call OpenRouter AI
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -159,9 +159,9 @@ ${chargeData.map(c => \`- \`${c.id}\`: ${c.amount} ${c.currency} (\${c.reason}) 
             <div class="issue-desc">${issue.description}</div>
           </div>
         </div>
-      `).join("") || "<div class='issue-item'><div class="issue-desc">No specific issues identified</div></div>";
+      `).join("") || '<div class="issue-item"><div class="issue-desc">No specific issues identified</div></div>';
 
-      const fixesHtml = parsed.fixes?.map(fix => `<div class="fix-item">${fix}</div>`).join("") || "<div class="fix-item">No specific fixes suggested</div>";
+      const fixesHtml = parsed.fixes?.map(fix => `<div class="fix-item">${fix}</div>`).join("") || '<div class="fix-item">No specific fixes suggested</div>';
 
       setAnalysisResult({
         insight: parsed.insight || "Unable to extract insight",
@@ -244,7 +244,7 @@ ${chargeData.map(c => \`- \`${c.id}\`: ${c.amount} ${c.currency} (\${c.reason}) 
 
       {error && <div className="status-badge status-failed" style={{ marginTop: "1rem" }}>
         {error}
-      </div>
+      </div>}
 
       {loading && (
         <div className="status-badge" style={{ marginTop: "1rem" }}>
